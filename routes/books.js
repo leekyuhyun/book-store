@@ -1,15 +1,12 @@
 import express from "express";
+import { getAllbooks, getBookById } from "../controller/bookController.js";
 
 const router = express.Router();
 
 router
-  .get("/", (req, res) => {
-    res.json("전체 도서 조회");
-  })
+  .get("/", getAllbooks)
 
-  .get("/:id", (req, res) => {
-    res.json("개별 도서 조회");
-  });
+  .get("/:id", getBookById);
 
 /* 
   .get("/", (req, res) => {
