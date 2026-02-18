@@ -13,7 +13,7 @@ export const join = (req, res) => {
     .pbkdf2Sync(password, salt, 10000, 10, "sha512")
     .toString("base64");
 
-  const sql = `INSERT INTO Users (email, name, password, salt) VALUES (?, ?, ?, ?)`;
+  const sql = `INSERT INTO users (email, name, password, salt) VALUES (?, ?, ?, ?)`;
   const values = [email, name, hashPassword, salt];
 
   conn.query(sql, values, function (err, results) {
@@ -31,7 +31,7 @@ export const join = (req, res) => {
 // 로그인
 export const login = (req, res) => {
   const { email, password } = req.body;
-  const sql = `SELECT * FROM Users WHERE email = ?`;
+  const sql = `SELECT * FROM users WHERE email = ?`;
 
   conn.query(sql, [email], (err, results) => {
     if (err) {
@@ -77,7 +77,7 @@ export const login = (req, res) => {
 // 비밀번호 초기화 요청
 export const pwdResetReq = (req, res) => {
   const { email } = req.body;
-  const sql = `SELECT * FROM Users WHERE email = ?`;
+  const sql = `SELECT * FROM users WHERE email = ?`;
 
   conn.query(sql, [email], (err, results) => {
     if (err) {
