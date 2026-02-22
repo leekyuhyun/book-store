@@ -64,17 +64,24 @@ npm run dev
 
 ### 도서 (Books)
 
-- `GET /books`: 도서 전체 조회 (카테고리별, 신간 필터링 및 페이지네이션 지원)
+- `GET /books`: 도서 전체 조회
+  - 서브쿼리를 사용하여 각 도서의 좋아요(likes) 개수 포함
+  - 카테고리별 조회 및 신간(최근 1개월) 필터링 지원
+  - 파라미터(`limit`, `currentPage`) 유무에 따라 선택적 페이지네이션 적용
 
-- `GET /books/:id`: 도서 개별 상세 조회
+- `GET /books/:id`: 도서 개별 상세 조회 (카테고리명 및 좋아요 수 포함)
 
 ### 카테고리 (Category)
 
 - `GET /category`: 전체 카테고리 목록 조회
 
-### 구현 예정 포함
+### 좋아요 (likes)
 
-- 좋아요 (Likes): 추가 및 삭제
+- `POST /likes/:liked_book_id`: 특정 도서에 좋아요 추가
+
+- `DELETE /likes/:liked_book_id`: 좋아요 취소
+
+### 구현 예정
 
 - 장바구니 (Carts): 담기, 조회, 삭제
 
@@ -87,3 +94,5 @@ npm run dev
 - `books`: 제목, 카테고리 ID, 가격, 출판일 등 도서 정보
 
 - `category`: 도서 분류 정보 (동화, 소설, 사회 등)
+
+- `likes`: 사용자(`user_id`)와 도서(`liked_book_id`) 간의 좋아요 관계 저장
