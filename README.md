@@ -81,9 +81,15 @@ npm run dev
 
 - `DELETE /likes/:liked_book_id`: 좋아요 취소
 
-### 구현 예정
+### 장바구니 (Carts)
 
-- 장바구니 (Carts): 담기, 조회, 삭제
+- `POST /carts`: 장바구니 담기 (도서 아이디, 수량, 사용자 아이디를 받아 장바구니에 저장)
+
+- `GET /carts`: 장바구니 목록 조회 (특정 사용자의 전체 목록을 조회하며, 선택된 ID(`selected`)가 있을 경우 해당 상품들만 필터링하여 데이터를 반환)
+
+- `DELETE /carts/:cart_id`: 장바구니 아이템 삭제 (장바구니 고유 ID(`cart_id`)를 통해 특정 항목을 삭제)
+
+### 구현 예정
 
 - 주문 (Orders): 주문하기, 목록 및 상세 조회
 
@@ -96,3 +102,5 @@ npm run dev
 - `category`: 도서 분류 정보 (동화, 소설, 사회 등)
 
 - `likes`: 사용자(`user_id`)와 도서(`liked_book_id`) 간의 좋아요 관계 저장
+
+- `cart`: 사용자(`user_id`)와 도서(`book_id`) 간의 장바구니 정보 및 수량(`quantity`) 저장
