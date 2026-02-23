@@ -52,3 +52,25 @@ CREATE TABLE likes (
     ON DELETE CASCADE
     ON UPDATE NO ACTION
 )
+
+-- 장바구니 테이블 생성 --
+CREATE TABLE cart (
+    cart_id INT NOT NULL AUTO_INCREMENT,
+    book_id INT NOT NULL,
+    user_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    PRIMARY KEY (cart_id),
+    
+    INDEX book_id_idx (book_id ASC),
+    INDEX user_id_idx (user_id ASC),
+
+    CONSTRAINT fk_cart_book 
+      FOREIGN KEY (book_id) 
+      REFERENCES books (book_id) 
+      ON DELETE CASCADE,
+      
+    CONSTRAINT fk_cart_user 
+      FOREIGN KEY (user_id) 
+      REFERENCES users (user_id) 
+      ON DELETE CASCADE
+);
