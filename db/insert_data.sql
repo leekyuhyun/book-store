@@ -51,3 +51,13 @@ INSERT INTO likes (user_id, liked_book_id) VALUES (2, 2);
 INSERT INTO likes (user_id, liked_book_id) VALUES (2, 3);
 INSERT INTO likes (user_id, liked_book_id) VALUES (2, 5);
 INSERT INTO cart (book_id, quantity, user_id) VALUES (1, 1, 1);
+
+-- 배송 테이블 --
+INSERT INTO delivery (address, receiver, contact) VALUES ("경기도 시흥시", "이규현", "010-1234-5678");
+INSERT INTO orders (book_title, total_quantity, total_price, user_id, delivery_id) 
+VALUES ("어린왕자들", 3, 60000, 1, 1);
+
+INSERT INTO orderedBook (order_id, book_id, quantity)
+VALUES (2, 1, 1);
+INSERT INTO orderedBook (order_id, book_id, quantity)
+VALUES (2, 3, 2);

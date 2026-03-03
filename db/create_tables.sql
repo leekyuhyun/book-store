@@ -74,3 +74,51 @@ CREATE TABLE cart (
       REFERENCES users (user_id) 
       ON DELETE CASCADE
 );
+
+-- 주문 테이블 생성 --
+CREATE TABLE delivery (
+  delivery_id INT NOT NULL AUTO_INCREMENT,
+  address VARCHAR(255) NOT NULL,
+  receiver VARCHAR(100) NOT NULL,
+  contact VARCHAR(100) NOT NULL,
+  PRIMARY KEY (delivery_id)
+)
+
+CREATE TABLE orders (
+  order_id INT NOT NULL AUTO_INCREMENT,
+  book_title VARCHAR(255) NOT NULL, 
+  total_quantity INT NOT NULL,  
+  total_price INT NOT NULL,    
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  user_id INT NOT NULL,
+  delivery_id INT NOT NULL,    
+  PRIMARY KEY (order_id), 
+
+  CONSTRAINT fk_orders_users 
+    FOREIGN KEY (user_id)
+    REFERENCES users (user_id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_orders_delivery
+    FOREIGN KEY (delivery_id)
+    REFERENCES delivery (delivery_id)
+    ON DELETE CASCADE
+)
+
+CREATE TABLE orderedBook (
+  ordered_book_id INT NOT NULL AUTO_INCREMENT,
+  order_id INT NOT NULL,
+  book_id INT NOT NULL,
+  quantity INT NOT NULL,
+  PRIMARY KEY (ordered_book_id),
+
+  CONSTRAINT fk_ordered_orders 
+    FOREIGN KEY (order_id)
+    REFERENCES orders (order_id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_ordered_books
+    FOREIGN KEY (book_id)
+    REFERENCES books (book_id)
+    ON DELETE CASCADE
+)
