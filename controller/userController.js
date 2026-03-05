@@ -49,6 +49,7 @@ export const login = (req, res) => {
       if (loginUser.password === hashPassword) {
         const token = jwt.sign(
           {
+            id: loginUser.user_id,
             email: loginUser.email,
             name: loginUser.name,
           },
