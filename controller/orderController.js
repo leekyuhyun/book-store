@@ -1,13 +1,15 @@
 import conn from "../db/mysql_connect.js";
+import { Authorization, handleAuthError } from "../utils/auth.js";
 import { StatusCodes } from "http-status-codes";
 
 export const order = async (req, res) => {
-  const { items, delivery, totalQuantity, totalPrice, userId, firstBookTitle } =
-    req.body;
-
-  const promiseConn = conn.promise();
-
   try {
+    const promiseConn = conn.promise();
+    const auth = Authorization(req);
+
+    const { items, delivery, totalQuantity, totalPrice, firstBookTitle } =
+      req.body;
+
     let sql = `INSERT INTO delivery (address, receiver, contact) VALUES (?, ?, ?)`;
     let values = [delivery.address, delivery.receiver, delivery.contact];
     let [results] = await promiseConn.execute(sql, values);
@@ -15,7 +17,7 @@ export const order = async (req, res) => {
 
     sql = `INSERT INTO orders (book_title, total_quantity, total_price, user_id, delivery_id) 
            VALUES (?, ?, ?, ?, ?)`;
-    values = [firstBookTitle, totalQuantity, totalPrice, userId, delivery_id];
+    values = [firstBookTitle, totalQuantity, totalPrice, auth.id, delivery_id];
     [results] = await promiseConn.execute(sql, values);
     const order_id = results.insertId;
 
@@ -33,22 +35,35 @@ export const order = async (req, res) => {
     return res
       .status(StatusCodes.CREATED)
       .json({ message: "주문 완료 및 장바구니가 비워졌습니다.", order_id });
-  } catch (err) {
-    console.error("주문 처리 중 에러 발생:", err);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
+  } catch (error) {
+    console.error("주문 처리 중 에러:", error);
+
+    if (
+      error.name === "TokenExpiredError" ||
+      error.name === "JsonWebTokenError"
+    ) {
+      const { status, message, code } = handleAuthError(error);
+      return res.status(status).json({ message, code });
+    }
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "주문 처리 중 에러가 발생했습니다.",
+      error: error.message,
+    });
   }
 };
 
-export const deleteCartItems = async (promiseConn, cartIds) => {
+export const deleteCartItems = async (promiseConn, items) => {
   const sql = `DELETE FROM cart WHERE cart_id IN (?)`;
-  const [result] = await promiseConn.query(sql, [cartIds]);
+  const [result] = await promiseConn.query(sql, [items]);
   return result;
 };
 
 export const getOrders = async (req, res) => {
-  const promiseConn = conn.promise();
-
   try {
+    const promiseConn = conn.promise();
+    const auth = Authorization(req);
+
     const sql = `
       SELECT 
         orders.order_id, 
@@ -61,23 +76,36 @@ export const getOrders = async (req, res) => {
         delivery.contact 
       FROM orders 
       LEFT JOIN delivery ON orders.delivery_id = delivery.delivery_id
-
+      WHERE orders.user_id = ?
     `;
 
-    const [results] = await promiseConn.execute(sql);
+    const [results] = await promiseConn.execute(sql, [auth.id]);
 
     return res.status(StatusCodes.OK).json(results);
-  } catch (err) {
-    console.error("주문 목록 조회 중 에러:", err);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
+  } catch (error) {
+    console.error("주문 목록 조회 중 에러:", error);
+
+    if (
+      error.name === "TokenExpiredError" ||
+      error.name === "JsonWebTokenError"
+    ) {
+      const { status, message, code } = handleAuthError(error);
+      return res.status(status).json({ message, code });
+    }
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "주문 목록 조회 중 에러가 발생했습니다.",
+      error: error.message,
+    });
   }
 };
 
 export const getOrderDetail = async (req, res) => {
-  const { id } = req.params;
-  const promiseConn = conn.promise();
-
   try {
+    const { id } = req.params;
+    const auth = Authorization(req);
+    const promiseConn = conn.promise();
+
     const sql = `
       SELECT 
         orderedBook.book_id, 
@@ -87,10 +115,12 @@ export const getOrderDetail = async (req, res) => {
         orderedBook.quantity 
       FROM orderedBook
       LEFT JOIN books ON orderedBook.book_id = books.book_id
-      WHERE orderedBook.order_id = ?
+      WHERE orderedBook.order_id = ? AND orderedBook.order_id IN (
+        SELECT order_id FROM orders WHERE user_id = ?
+      )
     `;
 
-    const [results] = await promiseConn.execute(sql, [id]);
+    const [results] = await promiseConn.execute(sql, [id, auth.id]);
 
     if (results.length === 0) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -99,8 +129,20 @@ export const getOrderDetail = async (req, res) => {
     }
 
     return res.status(StatusCodes.OK).json(results);
-  } catch (err) {
-    console.error("주문 상세 조회 중 에러:", err);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
+  } catch (error) {
+    console.error("주문 상세 조회 중 에러:", error);
+
+    if (
+      error.name === "TokenExpiredError" ||
+      error.name === "JsonWebTokenError"
+    ) {
+      const { status, message, code } = handleAuthError(error);
+      return res.status(status).json({ message, code });
+    }
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "주문 상세 조회 중 에러가 발생했습니다.",
+      error: error.message,
+    });
   }
 };
