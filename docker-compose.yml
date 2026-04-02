@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: book_store_db
+    restart: always
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: book_store
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/create_tables.sql:/docker-entrypoint-initdb.d/1_create.sql
+      - ./db/insert_data.sql:/docker-entrypoint-initdb.d/2_insert.sql
+
+  app:
+    build: .
+    container_name: book_store_app
+    ports:
+      - '9898:9898'
+    depends_on:
+      - db
+    environment:
+      PORT: 9898
+      DB_HOST: db
+      DB_USER: root
+      DB_PASS: 1234
+      DB_NAME: book_store
+      JWT_SECRET_KEY: devcourse
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run dev
+
+volumes:
+  db_data:
