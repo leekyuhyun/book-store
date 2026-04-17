@@ -1,0 +1,38 @@
+import { render, screen } from "@testing-library/react"
+import {BookStoreThemeProvider} from "../../context/themeContext.tsx";
+import {describe, expect, it} from "vitest";
+import BookItem from "./BookItem.tsx";
+
+const dummyBook = {
+    id: 1,
+    title: "Dummy Book",
+    img: 5,
+    category_id: 1,
+    form: "paperback",
+    isbn: "Dummy ISBN",
+    summary: "Dummy Summary",
+    detail: "Dummy Detail",
+    author: "Dummy Author",
+    pages: 100,
+    contents: "Dummy Content",
+    price: 10000,
+    likes: 1,
+    pubDate: "2021-01-01"
+}
+
+discribe("BookItem 테스트", () => {
+    it("렌더 여부", () => {
+        const {getByText } = render(
+            <BookStoreThemeProvider>
+                <BookItem book={dummyBook}></BookItem>
+            </BookStoreThemeProvider>
+        )
+    })
+
+    expect(getByText(dummyBook.title)).toBeInTheDocument();
+    expect(getByText(dummyBook.summary)).toBeInTheDocument();
+    expect(getByText(dummyBook.author)).toBeInTheDocument();
+    expect(getByText(dummyBook.price)).toBeInTheDocument();
+    expect(getByText(dummyBook.likes)).toBeInTheDocument();
+    expect(getByText(dummyBook.title)).toHaveAttribute("src", `https://picsum.photos/id/${dummyBook.img}/300/300`);
+})
